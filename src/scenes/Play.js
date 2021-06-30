@@ -26,10 +26,10 @@ class Play extends Phaser.Scene {
         // add rocket (p1)
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rockets').setOrigin(0.5, 0);
         // add spaceships (x3)
-        this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0);
-        this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0);
-        this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0,0);
-        this.bike = new Bike(this, game.config.width, borderUISize*6 + borderPadding*4, 'bike', 0, 40).setOrigin(0,0);
+        this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*5 + borderPadding*2, 'spaceship', 0, 30).setOrigin(0, 0);
+        this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*6 + borderPadding*4, 'spaceship', 0, 20).setOrigin(0,0);
+        this.ship03 = new Spaceship(this, game.config.width, borderUISize*8 + borderPadding*6, 'spaceship', 0, 10).setOrigin(0,0);
+        this.bike01 = new Bike(this, game.config.width, borderUISize*5 + borderPadding*4, 'bike', 0, 40).setOrigin(0,0);
         // define keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -135,9 +135,9 @@ class Play extends Phaser.Scene {
 
     bikeExplode(bike) {
         // temporarily hide bike
-        ship.alpha = 0;
+        bike.alpha = 0;
         // create explosion sprite at ship's position
-        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
+        let boom = this.add.sprite(bike.x, bike.y, 'explosion').setOrigin(0, 0);
         boom.anims.play('explode');             // play explode animation
         boom.on('animationcomplete', () => {    // callback after anim completes
           bike.reset();                         // reset ship position
@@ -146,6 +146,7 @@ class Play extends Phaser.Scene {
         });   
         // score add and repaint
         this.p1Score += bike.points;
+        this.gameTimer += bike.points / 10;
         this.scoreLeft.text = this.p1Score;  
         
         //this.sound.play('sfx_explosion');
@@ -165,6 +166,7 @@ class Play extends Phaser.Scene {
         });   
         // score add and repaint
         this.p1Score += ship.points;
+        this.gameTimer += ship.points / 10;
         this.scoreLeft.text = this.p1Score;  
         
         //this.sound.play('sfx_explosion');
