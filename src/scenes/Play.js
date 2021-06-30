@@ -7,6 +7,7 @@ class Play extends Phaser.Scene {
         // load images/tile sprites
         this.load.image('rockets', './assets/rockets.png');
         this.load.image('spaceship', './assets/spaceship.png');
+        this.load.image('bike', './assets/bike.png');
         this.load.image('deserts', './assets/deserts.png');
         // load spritesheet
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
@@ -28,6 +29,7 @@ class Play extends Phaser.Scene {
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0);
         this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0);
         this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0,0);
+        this.bike = new Bike(this, game.config.width, borderUISize*6 + borderPadding*4, 'bike', 0, 40).setOrigin(0,0);
         // define keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -84,6 +86,7 @@ class Play extends Phaser.Scene {
             this.ship01.update();           // update spaceships (x3)
             this.ship02.update();
             this.ship03.update();
+            this.bike01.update();
         } 
 
         // check collisions
@@ -99,6 +102,10 @@ class Play extends Phaser.Scene {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
         }
+        if (this.checkCollision(this.p1Rocket, this.bike01)) {
+            this.p1Rocket.reset();
+            this.bikeExplode(this.bike01);
+        }
     }
     checkCollision(rocket, ship) {
 
@@ -112,6 +119,39 @@ class Play extends Phaser.Scene {
             return false;
         }
     }
+
+    checkCollision(rocket, bike) {
+
+        // simple AABB checking
+            if (rocket.x < bike.x + bike.width && 
+            rocket.x + rocket.width > bike.x && 
+            rocket.y < bike.y + bike.height &&
+            rocket.height + rocket.y > bike. y) {
+                return true;
+        } else {
+            return false;
+        }
+    }
+
+    bikeExplode(bike) {
+        // temporarily hide bike
+        ship.alpha = 0;
+        // create explosion sprite at ship's position
+        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
+        boom.anims.play('explode');             // play explode animation
+        boom.on('animationcomplete', () => {    // callback after anim completes
+          bike.reset();                         // reset ship position
+          bike.alpha = 1;                       // make ship visible again
+          boom.destroy();                       // remove explosion sprite
+        });   
+        // score add and repaint
+        this.p1Score += bike.points;
+        this.scoreLeft.text = this.p1Score;  
+        
+        //this.sound.play('sfx_explosion');
+        this.sound.play('sfx_explosion');
+        }    
+
     shipExplode(ship) {
         // temporarily hide ship
         ship.alpha = 0;
